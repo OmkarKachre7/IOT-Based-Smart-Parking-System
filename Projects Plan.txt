@@ -1,0 +1,14 @@
+Project Plan
+Block diagram designing.
+Study of Component  
+Market survey for components
+Circuit designing
+Circuit testing on bred board
+Order PCB layout designing And PCB making
+PCB testing
+Components soldering and assembling
+Hard wear testing
+Micro controller programming
+Testing and trouble shooting
+Project report making
+

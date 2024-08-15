@@ -1,0 +1,976 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<!-- saved from url=(0045)http://members.ozemail.com.au/~mvw/micro.html --><HTML><HEAD><TITLE>Microcontrollers</TITLE>
+<META http-equiv=Content-Type content="text/html; charset=iso-8859-1">
+<META content="MSHTML 6.00.2900.2180" name=GENERATOR></HEAD>
+<BODY bgColor=#ffffff>
+<H1 align=center>Microcontrollers</H1>
+<P align=center>Last updated: <!--webbot bot="Timestamp"
+startspan s-type="EDITED" s-format="%d/%m/%y %H:%M" -->29/06/98 02:06<!--webbot
+bot="Timestamp" i-checksum="17208" endspan --></P>
+<P align=center><EM>I wrote almost everything on this page from memory. If you 
+spot any mistakes or obvious omissions please let me know. Violent disagreements 
+are also accepted :-)</EM></P>
+<P>I've had a lot of experience with a fair variety of low-end microcontrollers, 
+so I thought I'd slap together a page describing what they are, how to use them 
+and giving my impressions of the families I've used. I refer to them as 
+<EM>micros</EM>, but you'll often see them called <EM>MCUs</EM> (Micro 
+Controller Units). <EM>Micro</EM> rolls off the tongue nicely,m and makes you 
+sound like a pro when you talk about them. I use italics when defining a term or 
+using it for the first time.</P>
+<H2>What Is a Micro?</H2>
+<P>A microcontroller is a computer on a single chip; it contains a CPU (usually 
+called the <EM>core</EM>) and a variety of <EM>peripherals</EM> which assist 
+your application. In simple circuits the micro may be the only IC! By contrast a 
+typical CPU, like the x86 in your PC, contains <U>only</U> the core - all 
+peripherals, like timers and DMA controllers, are in external chips. Many micros 
+can operate with no external components except an oscillator (a crystal or 
+ceramic resonator) - some do not even require this, having an oscillator built 
+in!</P>
+<P>You might not be aware of this, but micros greatly outnumber conventional 
+CPUs (as used in PCs) on this planet, numbering in the billions. Almost all 
+modern appliances include them to support the friendliness and programmability 
+consumers expect these days. Micros can have a very long life span - chips first 
+offered in the late 70s are still chosen for many new designs today!</P>
+<H2>The Micro World</H2>
+<P>At the top level, micros are classified by the number of bits in a data (not 
+instruction) word. The most popular segment by far is the 8-bit micro, which is 
+what this document attempts to cover. 4-bit micros are used in many high-volume 
+appliances with miniman computing needs, but they are not easily accessible to 
+low-volume users. 16 and 32-bit micros are much more powerful and 
+correspondingly larger - many 32-bit devices are designed to offer Pentium-class 
+power at a fraction of the power and price for battery-operated computers, video 
+game consoles etc.</P>
+<P>8-bit micros range in size from very small (only 8 pins!) to very large (over 
+200 pins), with some large chips providing power and expandability comparable to 
+that of modern CPUs. Since applications for very large micros are specialised 
+and expensive to pursue, we will concentrate on micros offering through-hole 
+rather than surface-mount parts, which effectively limits us to 84-pin and 
+smaller devices.</P>
+<H2>External Buses</H2>
+<P>Micros can be divided into two major groups - those with and without an 
+<EM>external bus (EB)</EM>. An external bus (offering address and data lines) 
+enables a wide variety of peripheral chips to be connected in almost any 
+quantity; this flexibility comes at the cost of board space, chip size, chip 
+count, power consumption and RFI emissions. However, since micros without 
+on-chip code memory are cheap to manufacture, some EB micros offer excellent 
+value even with the cost of the additional chips considered. </P>
+<P>A major advantage of EB micros for the beginner or hard-up developer is that 
+EPROMs (in which code for EB micros is usually stored) are cheap and large in 
+capacity; EPROM programmers and emulators are cheap and easy to use, since they 
+are not specific to any micro family. Non-EB micros, whose code is stored 
+on-chip, require custom programming equipment, which may be cheap and DIY-able, 
+or may be very expensive.</P>
+<H2>Program Storage</H2>
+<P>The next major distinctions between micros is the manner in which the program 
+(usually called <EM>code</EM>) you create is stored:</P>
+<P><EM>ROMless</EM> micros are those with an external bus, as discussed above, 
+which require an EPROM or non-volatile SRAM for code storage. </P>
+<P>An <EM>OTP</EM> <EM>(One-Time Programmable)</EM> micro can be programmed 
+exactly once. If the program isn't correct, you throw it away. OTPs are the most 
+popular micro type for low-volume production, where the setup cost of masking 
+(see next) can't be justified. Many manufacturers now produce cheap OTPs that 
+are price-competitive with masked micros, and some have dropped masking in 
+favour of factory-programmed OTPs! For any OTP there is usually an EPROM 
+equivalent that can be erased for development. In fact, an OTP is usually just 
+an EPROM without that expensive windowed ceramic package. Don't confuse EPROM 
+micros with EPROMs as used by ROMless micros for program storage.</P>
+<P>A <EM>masked</EM> micro contains ROM that is programmed by the factory from 
+code you supply. They are cheaper than equivalent OTP or flash micros, but you 
+have to pay $1000s up front and place orders for thousands of chips. Unless you 
+work for a large company with deep pockets you'll probably never hear about 
+masking again :-)</P>
+<P><EM>Flash</EM> micros are the new kid on the block. They operate similarly to 
+OTPs, but can be re-programmed many times, usually at least 1000. This makes it 
+feasible to use one chip to test code changes over and over again, and avoid 
+wastage of chips. Flash is still more expensive than comparable OTP, but the 
+difference is diminishing and may eventually disappear. Several manufacturers 
+are betting on flash micros as their future.</P>
+<P>ROMless and Flash micros share the advantage that the micro does not need to 
+be removed from its board for the code to be changed. This is very useful when 
+developing with high-pin-count surface-mount micros, which generally cannot be 
+socketed on the board.</P>
+<H2>Software Tools</H2>
+<P>Coding for micros is generally done in either the core's native assembly 
+language or C, although other high-level languages, notably BASIC, are available 
+for some families. For those who haven't seen assembly code before (I'm sure you 
+exist!) it consists of short mnemonics and operands specifying the basic 
+operations of which the core is capable. Assemblers are almost always supplied 
+free by the micro's manufacturer or a third party, and vary widely in power, 
+while C compilers vary from free and very buggy to very expensive and only 
+moderately buggy. Due to economies of scale, you will <U>not</U> find C 
+environments comparable to those available for PCs in friendliness, reliability 
+or value. Also, hand-coded assembler is generally smaller and faster that C, 
+which is usually important unless code space is abundant.</P>
+<P>For these reasons I recommend writing in assembly unless you can afford the 
+very best compilers and have a project of sufficient complexity to justify using 
+them. I also strongly suggest that writing C for a micro you haven't mastered in 
+assembly is a bad idea, since you won't be able to spot the inevitable compiler 
+bugs and write efficient code. However, by all means try free or cheap compilers 
+for a micro you've already written assembler for, if they exist, but be 
+cautious.</P>
+<P>Although assemblers do a relatively simple job they are not bound by any ANSI 
+standard, so they vary widely in syntax and power. A good assembler offers 
+nested macros with local labels, nested conditional assembly and helpful error 
+messages. The ability to <EM>link</EM> the assembled <EM>object</EM> files from 
+multiple source files is useful on large projects, but assemblers are so fast on 
+modern PCs that it doesn't save time on smaller projects. An interesting variant 
+of the assembler is the <EM>structured assembler</EM>, which allows you to use 
+flow control construct typical of a high-level language, like if-then-else and 
+switch statements, in assembly. This greatly improves readability while 
+introducing very little abstraction. Unfortunately they're quite rare.</P>
+<P>Ultimately your software tools must produce a file for downloading to the 
+micro or EPROM. This must be in a format recognised by the hardware tools (see 
+next), usually <EM>binary</EM>, <EM>hex</EM> or <EM>S19</EM>. Programs to 
+convert between all of these exist, so don't sweat too much about it. Hex is 
+probably the most common of these, and is a simple text file containing 
+addresses and data.</P>
+<P>Since most micro software tools are still DOS programs, coding with a text 
+editor which can execute a batch file at the touch of a key is very handy; the 
+batch file assembles or compiles your code and can, tools permitting, download 
+it to the micro or EPROM for you!</P>
+<H2>Programming Tools</H2>
+<P>OK, you've written a program and have a hex file hot to trot - how do you get 
+it into the micro? The easiest category to deal with is ROMless micros: you 
+either program (<EM>burn</EM>) your code into an EPROM using an EPROM 
+programmer, or download it to an EPROM emulator, which plugs into your board's 
+EPROM socket and pretends to be an EPROM. Burning and erasing EPROMs is tedious; 
+a typical EPROM emulator downloads your program from your PC's parallel port in 
+a few seconds and resets the micro for you. If you are planning to do any work 
+with a ROMless micro you should get one - several are available as kits, and I 
+can personally recommend the one sold by Altronics.</P>
+<P>For OTP and flash micros a programmer specific to the micro family you're 
+using is required. Cheap units sold by the chip's manufacturer are often 
+available, and where the manufacturer has published the micro's programming 
+specs various public domain hardware &amp; software (usually parallel port and 
+DOS respectively) can be found on the net, and are very easy to build. A small 
+flash micro with a public domain programmer is probably the cheapest computer 
+development system on Earth! With some micros not all programmers can enable all 
+features of the micro (eg the internal oscillator), so consider these 
+limitations before investing in one.</P>
+<H2>Other Development Tools</H2>
+<P>There's one other major development tool I haven't discussed, and that's the 
+<EM>emulator</EM>. Its job is to let you explore the internals of the micro 
+while your program's running or being stepped, just like PC compilers do. An 
+emulator is usually an external box which communicates with custom software 
+running on your PC via a serial port, and attaches to a <EM>pod</EM> which plugs 
+into the micro's socket on your board, appearing to be the micro from your 
+circuit's point of view. A true emulator can run your program in real time (as 
+fast as the micro itself would) and supports all of the micro's features.</P>
+<P>Because they are specific to a micro family (and the pod often to one 
+particular micro) emulators can be very expensive - I've used one worth 
+US$20,000! Typical emulators for popular micros are US$3000-5000. Be careful of 
+very cheap units (sub US$1000) claiming to be "emulators" - many can't function 
+in real time,"steal" some port lines and interrupts for their own use, are 
+limited in clock speed and require you to include a special module in your code. 
+Depending on your application they may be adequate, but be very careful to read 
+the fine print before buying any "emulator", especially a cheap one. Also be 
+aware that emulators can differ electrically to the micros they emulate in 
+current capabilty and exact timing; they can't emulate low-power modes and the 
+micro's behaviour at low suplpy voltages.</P>
+<P>The <EM>simulator</EM> is an increasing popular tool these days, since it 
+offers some of the power of a real-time emulator for little or no cost. It 
+emulates the micro's core in software running on your PC, allowing you to run 
+and step through your program, examining and modifying register and memory 
+contents etc. Good simulators also let you create <EM>stimulus</EM> files, which 
+perform I/O changes on the micro under simulation. Although simulators are an 
+excellent tool for verifying and debugging sections of data-processing code, 
+they cannot solve problems caused by unexpected real-time behaviour of your 
+circuit. No simlulator even approaches the real-time speed of the micro 
+itself.</P>
+<P>Lastly there's the <EM>monitor</EM>, which is a module you include in your 
+code which communicates with PC software; typically it uses a serial port to 
+talk to a simple terminal program. Their capabilities vary widely, but it can 
+typically send text messages and ASCII-converted numbers to the user, allow you 
+to freeze the program (except perhaps for interrupt handlers) and examine and 
+change memory locations and peripherals. Of course, a monitor will use a micro 
+peripheral, usually a UART if available, for communications; it won't be 
+available to your code.</P>
+<H2>Micro Features</H2>
+<P>Now that you have a grasp of the micro development process, let's look at a 
+typical micro's hardware features.</P>
+<H3>Supply Voltage Range</H3>
+<P>Most micros run optimally at the standard 5.0V, but some are designed 
+specifically for lower voltages e.g. 3.3V. Due to advances in CMOS technology 
+many micros are guaranteed to run happily from 6.0V down to 2.7V or even lower, 
+although their maximum clock speed may decrease with voltage.</P>
+<P>Operating micros at very low voltages (from batteries or backup capacitors) 
+is fraught with danger - a well-tested external watchdog is the best safeguard 
+against lockups due to unpredictable voltages.</P>
+<H3>The Clock</H3>
+<P>Like any computing device, a micro has a master oscillator, usually called 
+the <EM>clock</EM>. This can be a crystal or the cheaper but less precise 
+ceramic resonator. Some small micros offer an internal clock, usually driven by 
+an RC (resistor-capacitor) network, whose frequency can vary greatly with 
+voltage, temperature and from batch to batch. If your application isn't 
+time-sensitive or can calibrate itself against an external timebase (such as a 
+mains voltage cycle) you may be able to use an internal oscillator. If you're in 
+any doubt, don't try!</P>
+<P>Typical clock frequencies are 4-16MHz. Unlike PCs, the frequency doesn't give 
+any absolute measure of a micro's computing muscle (<EM>throughput</EM>), which 
+is measured in MIPS (millions of operations per second), since the number of 
+clock cycles required to execute even the simplest instructions varies widely 
+between cores, and some instructions take longer than others. A useful figure is 
+MIPS/MHz, which indicates roughly how many MIPS of throughput are produced by 
+each MHz of clock speed. Of course, higher clock speeds increase power 
+consumption and RFI emissions.</P>
+<H3>The Reset Input</H3>
+<P>This is pretty self-explanatory - pulsing it resets the micro, restarting 
+your code from scratch. Most micros have an active low reset, but some are 
+active high. Most small and newer micros will start up when power is applied 
+with RESET unconnected or tied to the inactive power rail, but some older 
+families require that an RC delay or a clean pulse be applied after power-up. A 
+few micros have no RESET pin, preferring to offer an extra I/O line. Thay cannot 
+be reset under external control except by removing power, which is not normally 
+a problem if they offer an on-chip watchdog (see next).</P>
+<H3>The Brown-Out Detector</H3>
+<P>Still uncommon, the brown-out detector resets the micro if the supply voltage 
+falls seriously below the nominal value, and holds it in the reset state until 
+it rises again. This prevents unpredictable or erratic operation at low 
+voltages, including EEPROM corruption.</P>
+<P>EEPROM corruption is usually the most pressing reason to use brown-out 
+protection; external 3-pin chips (that look like transistors) are available to 
+do this job. Otherwise it's not generally important.</P>
+<H3>The Watchdog</H3>
+<P>A watchdog is something every good micro-based circuit should have. Many 
+micros include one on the chip, which must be regularly <EM>fed</EM> by your 
+code or it will reset the micro. If your micro doesn't have one, use an external 
+watchdog chip such as the Dallas 1232 or equivalent. Most micros with watchdogs 
+enable your code to tell if the last reset was caused by the watchdog.</P>
+<H3>I/O Ports</H3>
+<P>All micros offer digital I/O ports, which you can use as digital input or 
+output. An I/O port is generally a group of up to 8 <EM>I/O lines</EM> which are 
+addressed together as a byte. Usually any line can be configured as an input or 
+output, with optional weak pullup (effectively a large resistors connected to 
+VCC) often available for inputs. The 8051 family has a unique (AFAIK) I/O design 
+which does not distinguish between inputs and outputs - details in that 
+section.</P>
+<P>It is common for I/O lines to have an alternate (<EM>special</EM>) function 
+related to a peripheral; it's your choice whether that line is used by that 
+peripheral or as standard digital I/O. Some I/O lines may have higher current 
+capacity than others, for driving LEDs and other heavy loads; sinking 20mA (low 
+output) is a typical figure for a high-current output. If you take advantage of 
+high-current outputs be sure to observe the micro's total maximum current 
+rating.</P>
+<H3>Interrupts</H3>
+<P>Interrupt are a fundamental concept in micros, and computers in general. 
+Although your program generally follows a predictable linear path through your 
+code, various conditions (both internal and external to the chip) can cause the 
+micro to execute an <EM>interrupt handler</EM>, then return to your <EM>main 
+program</EM> where it left off. Interrupts allow your code to respond to events 
+that require urgent attention without the need to waste time checking for that 
+event regularly. Interrupt handlers should be as short as possible to avoid 
+introducing serious delays into your code, and preventing other interrupt 
+handlers from executing. It's common for an interrupt handler to record whatever 
+caused the interrupt (such as a byte received from a UART) and set a flag to 
+indicate this to the main program.</P>
+<P>Interrupt handlers must save any registers or memory locations that they use 
+whose corruption may affect the main program; the stack is usually used for 
+this. Most micros allow interrupt handlers to be nested (ie an interrupt handler 
+interrupted by another interrupt handler), although this may require special 
+action on your part and may increase the stack usage of your program. All 
+interrupts are disabled when your program starts, and must be enabled by your 
+code.</P>
+<P>The simplest type of interrupt is the <EM>external interrupt</EM>, which is 
+triggered when a particular I/O line changes state. Where other peripherals can 
+generate interrupts this is noted. Although rare, micros without <U>any</U> 
+interrupts do exist - you should consider whether your application can cope 
+without them before using one.</P>
+<H3>Timers</H3>
+<P>Timers are perhaps the most important standard micro peripheral. A timer is a 
+counter driven by some division of the clock; a user-settable divider is called 
+a <EM>prescaler</EM>. Timers are either 8 or 16 bits in length, and virtually 
+all micros (AFAIK) offer at least one 8-bit timer; both up and down-counting 
+timers exist. You can usually start and stop a timer, read and set its value and 
+generate a interrupt when it reaches zero (<EM>overflows</EM>), which allows you 
+to generate accurate time intervals. More powerful 16-bit timers offer 
+<EM>capture</EM> and/or <EM>compare</EM>, usually both. A capture facility 
+records the timer's value in a register when an external I/O edge (level 
+transition) occurs, optionally generating an interrupt; a compare facility lets 
+you specify a value which, when reached by the timer, causes an I/O output to 
+change and/or an interrupt to occur. It's possible to measure and generate 
+timing delays of great accuracy with capture/compare. Some specialised micros 
+intended for complex timing tasks (eg engine ignition) offer timers with 
+multiple captures and compares attached to them!</P>
+<P>Also common are <EM>auto-reload</EM> timers, which automatically reload 
+themselves with a specified value and start again when they reach zero, 
+optionally generating an interrupt. These can be used to accurately generate 
+interrupts at regular intervals or count at any desired rate. Related to these 
+are <EM>PWM (Pulse Width Modulation)</EM> facilities, which produce a pulse 
+stream with a precisely defined duty cycle (relative low and high times).</P>
+<P>On 8-bit micros 16-bit timers present unique problems in handling the 
+associated register pairs correctly. The data should explain this in detail; the 
+registers must usually be accessed in the correct order.</P>
+<P>Since timers are so important and can vary so widely in power, it's essential 
+to carefully study the timer capabilities of any micro you're considering and 
+assure yourself that they'll support what you want to do.</P>
+<H3>Analog Input and Output</H3>
+<P>Some micros, especially larger ones, have 8 or 10-bit A/D converters. Since a 
+micro is a very noisy environment for A/D conversion many micros allow you 
+literally switch off other peripherals while conversions are taking place. Most 
+can generate interrupts when conversions are complete. A/D converters raise the 
+cost of micros dramatically and limit your choice greatly, so consider using an 
+off-chip A/D instead. If conversion speed is not important serial A/Ds like the 
+TLC549 can do the job without consuming many I/O lines. A few micros also offer 
+D/A converters for analog output.</P>
+<P>See Design Tricks for other ways of implementing analog input and output.</P>
+<H3>Serial Interfaces</H3>
+<P>A UART (Universal Asynchronous Receiver/Transmitter) is a peripheral that 
+implements an asynchronous serial interface, as used in standard RS-232 
+connections, so they're very handy for talking to a PC, a terminal or another 
+micro. They all offer the same facilities - the thing to sweat over is the baud 
+rate. Some UARTs require a timer for this while others use a separate baud rate 
+generator driven by the clock. Most micro data contains tables of achievable 
+baud rates at various clock frequencies; some of these frequencies may look 
+strange to you, but 11.059MHz crystals are available simply because they allow 
+an 8051 to offer the standard baud rates! Bear in mind that a baud rate error of 
+up to 3% is acceptable to most UARTs.</P>
+<P>If you have a need for speed, more modern micros can offer up to 1Mb/s, but 
+consider carefully whether it's fast enough to allow you to receive data at that 
+rate. At 1Mb/s a byte could arrive every 10us, which requires a pretty quick 
+micro on the receiving end!</P>
+<P>Some micros offer an SPI (Serial Peripheral Interface) or I2C (Integrated 
+InterConnect) interface, both of which use a clock line rather than as assumed 
+baud rate to regulate data movement, and are hence synchronous. Both standards 
+allow connection to multiple peripheral chips, expecially time-of-day clocks and 
+EEPROMs, with the use of only 2 or 3 I/O lines, and can operate at very high 
+speeds. Although Philips offers a wide range of I2C peripherals, they can be 
+expensive - be careful.</P>
+<H3>EEPROM</H3>
+<P>EEPROM (Electrically Erasable Programmable Read Only Memory) is non-volatile 
+memory - it retains its contents when power is removed. Some micros include a 
+small amount of EEPROM (often called <EM>E-squared</EM> in speech) storage for 
+use by your code.</P>
+<P>In the past on-chip EEPROM was relatively rare and expensive compared to an 
+external EEPROM chip, but it appears that flash micros can offer EEPROM at 
+little additional cost due to the similarity with flash storage (the difference 
+is that EEPROM bytes can be selectively erased and rewritten, if you're 
+interested). Expect EEPROM to become more common in future.</P>
+<P>The use of EEPROM requires some care. Erasing and rewriting an EEPROM 
+location takes several milliseconds, for which time your code must wait if 
+writing multiple locations, and loss of power can corrupt an EEPROM write in 
+progress if the micro doesn't have an internal or external brownout 
+detector.</P>
+<H3>Analog Comparator</H3>
+<P>The inclusion of analog comparators on micros is a fairly recent wrinkle, but 
+they can be very handy in circuits which have to interface with an analog world. 
+Typically the output of the comparator appears to your code as a port pin, and 
+may be able to generate an interrupt. Since micros are quite noisy internally, 
+don't assume they will be quite as precise as an external comparator.</P>
+<H3>Low-Power Modes</H3>
+<P>Most micros can enter one or more low-power states, where your program does 
+not run and very little power is drawn, for conservation of batteries, backup 
+capacitors etc. The micro is "woken up" and execution resumed by a timer or 
+external interrupt or an I/O line state change. These modes are typically called 
+Wait, Idle, Sleep etc, and can reduce power supply current to several microamps, 
+dependent on supply voltage and ambient temperature.</P>
+<H3>Real-Time Clocks</H3>
+<P>Some micros, especially those intended for consumer appliances, include a 
+<EM>real-time clock</EM>, which helps you keep track of the time of day even 
+when the micro is in a low-power mode, and runs from a separate 32768Hz crystal. 
+Typically it generates an interrupt at 1/2 second intervals; the interrupt 
+handler can increment time-of-day counters.</P>
+<H3>Specialised Display Drivers</H3>
+<P>Micros targeted at modern appliances using LCD and gas plasma displays often 
+include drivers to support them. Since these displays are custom-designed for 
+specific applications they're usually of interest only to high-volume appliance 
+designers. Japanese micro mfrs are particularly strong in display drivers.</P>
+<H2>External Peripherals</H2>
+<P>These are the more common chips which can be easily connected to micros to 
+support features they don't provide. Bus interface peripherals are best suited 
+to micros with external buses, usually ROMless, due to the large number of 
+connections they require. Bus peripherals are divided according to the bus 
+design with which they are compatible, either Intel or Motorola. Both companies 
+introduced bus peripherals suitable for their 8-bit CPUs in the 70s, and their 
+later micros used compatible buses. Intel, Tundra and OKI offer Intel-bus 
+peripherals; Motorola and SGS-Thompson offer Motorola-bus peripherals. Beware of 
+NMOS versions of these parts, which can have very high power consumption. The 
+original IBM PC was full of Intel-bus peripherals, which are still available and 
+work with the 8051. Serial interface peripherals can be used with any micro, 
+although some provide an easy-to-use hardware interface; code to emulate this is 
+available for all popular micros.</P>
+<P><STRONG>Timer </STRONG>(bus interface): Contains three separate16-bit timers 
+which can be used in various ways.</P>
+<P><STRONG>UART </STRONG>(bus interface): Contains one or more separate UARTs. 
+May offer handshaking lines and FIFOs which allow bytes to be handled in groups, 
+features not usually found in micro UARTS. May also be called an ACIA 
+(Asynchronous Communications Interface Adapter). Quad and octal UARTs are UARTs 
+capable of 3Mb/s are available for special communications needs. Peripherals 
+supporting proprietary communications protocols (eg IBM networking) also 
+exist.</P>
+<P><STRONG>I/O extender</STRONG> (bus or serial interface): Provides more 
+general digital I/O - typically 24 lines for a 40-pin package.</P>
+<P><STRONG>A/D converter</STRONG> (bus or serial interface): Provides analog 
+inputs. Many offer features not often found on micros, such as a settable 
+voltage range or 12-bit conversion. They tend to work better than on-micro A/D 
+converters because they're isolated from the noisy internals of the micro.</P>
+<P><STRONG>Real-Time Clock</STRONG> (serial interface): A chip with its own 
+crystal and backup battery support which keeps track the time of day and date. 
+More capable than the peripheral of the same name found in some larger 
+micros.</P>
+<P><STRONG>Non-Volatile RAM</STRONG> (bus or serial interface): Flash or EEPROM 
+memory which retains its contents when power is removed. The bus interface 
+offers much faster access, but serial interfaces are cheaper and suit smaller 
+micros.</P>
+<P>Many standard 74-series <STRONG>logic chips</STRONG> (most commonly 74HC 
+CMOS) can work with micro buses or be used to reduce I/O requirements. For 
+example, the 74HC574 octal latch can provide 8 digital outputs and the 74HC595 
+shift register can be used to drive any number of digital outputs from just 
+three micro outputs, albeit slowly.</P>
+<H2>Micro Architecture</H2>
+<P>Now that you're au fait with all the goodies micros have to offer, how do you 
+get at that stuff? And what kind of environment is your program running in 
+anyway? That's architecture.</P>
+<H3>Basic Types</H3>
+<P>There are two basic types of architecture to be found in micros:</P>
+<P>The <EM>Harvard</EM> architecture locates the code and data storage areas 
+(memory <EM>spaces</EM>) on separate buses, which allows instructions and data 
+to be fetched simultaneously by the core, improving efficiency. The downside is 
+that fetching data from the code space (as is done for lookup tables) requires 
+special handling by the core, usually a special instruction. Code address 0 and 
+data address 0 can co-exist happily on a Harvard micro, since they're addressed 
+on separate buses. Most micros use the Harvard architecture because of its 
+efficiency.</P>
+<P>The <EM>Von Neumann</EM> architecture puts all memory spaces on the same bus, 
+so every location in every space must have a unique address. This enables every 
+space to be treated identically as instructions or data, which has some 
+interesting possibilities, but is less efficient. PC architectures, where memory 
+locations can't be pre-wired as RAM or ROM, are Von Neumann, except that I/O 
+occupies a separate space (accessed by the IN and OUT instructions). The HC05 
+core is an example of a Von Neumann architecture.</P>
+<H3>CISC and RISC</H3>
+<P>In parallel with the interest in RISC for large CPUs came RISC architectures 
+for micros. The hallmark of a RISC micro is that instruction words are more than 
+8 bits long (eg 12, 14 or 16 bits) and most instructions only require one word, 
+whereas conventional CISC micros have 8-bit instruction words and many 
+instructions that require more than one of them.</P>
+<P>Generally RISC micros are designed for speed, and sacrifice some ease of use 
+to that end, but the difference in ease of use isn't so great that it should 
+influence your choice of micro. You're more likely to pick a PIC or AVR RISC 
+micro for its speed than reject it because its instruction set is small or 
+appears strange.</P>
+<H3>To Accumulate Or Not To Accumulate</H3>
+<P>The major difference to be found when comparing the instruction sets of 
+micros is that some require that most arithmetic and logical operations be 
+performed on a single register, usually called the <EM>accumulator</EM>, while 
+others allow any of a number of registers to be used. The advantage of the 
+accumulator approach is that instructions using it can be short, mostly 8 bits, 
+whereas non-accumulator cores require a longer instruction word or multiple 
+instruction bytes to specify the operation. However, accumulator cores are poor 
+at multi-byte (eg 16, 24 or 32-bit) data operations because every byte must pass 
+through the accumulator. The resulting code is also more convoluted and 
+difficult to read.</P>
+<P>Since non-accumulator designs suit the wider instruction words of RISC cores 
+they'll probably become more common. Although pleasant to use, they chew code 
+space more quickly and don't make a major difference to performance unless a lot 
+of multi-byte processing is required. The Atmel AVR and Zilog Z8 are examples of 
+non-accumulator cores.</P>
+<H3>Spaces</H3>
+<P>The proliferation of spaces in some micros is probably the toughest thing to 
+get to grips with architecturally. Some subset of the following spaces is found 
+in all micros:</P>
+<P><STRONG>Code</STRONG>: Where your program is stored.</P>
+<P><STRONG>Data</STRONG>: RAM locations available to your program. The I/O space 
+may be mapped into this space rather than separate.</P>
+<P><STRONG>Registers</STRONG>: May be mapped into the Data space or made 
+entirely separate in RISC-type architectures. Access to registers is faster and 
+more capable than access to Data.</P>
+<P><STRONG>I/O</STRONG>: Special locations which form the program's interface 
+with Port I/O and peripherals.</P>
+<P>ROMless micros also possess an external space for access to the external bus, 
+which may be separate or mapped into the single Data space.</P>
+<P>Understanding the spaces understood by a micro and their functions is the 
+basic step in coming to grips with its architecture. Study the memory maps 
+carefully - many cores offer ways to map one space into another that can make 
+your life much easier. The 8051 is an example of a core with a variety of 
+spaces, all of which must be understood to make effective use of it.</P>
+<H3>The Stack</H3>
+<P>All micros have a stack - a dynamic RAM area onto which return addresses are 
+<EM>pushed</EM> when you call a routine or an interrupt handler is invoked, and 
+off which they are <EM>popped</EM> when these routines finish. Some very small 
+micros with very a small Data space implement a special small space for the 
+stack (termed a <EM>hardware</EM> stack) which may be as small as 3 locations, 
+severely limiting the nesting of routine calls and interrupt handlers allowed! 
+Most micros require you to set a <EM>stack pointer</EM> at startup. which is 
+then used as a base for the stack, which grows upward or downward (make sure you 
+know which). </P>
+<P>If RAM space is tight, work out what the maximum possible stack size is, and 
+reserve space for it accordingly. Corruption of the stack by other data (or vice 
+versa) can be tough to track down, so it's better to be cautious here.</P>
+<P>Most micros allow you to push and pop data onto and off the stack yourself. 
+Apart from saving registers in interrupt handlers, the stack can often be useful 
+when you're short of registers and need to temporarily save their values.</P>
+<H3>Vectors</H3>
+<P>A vector is a special program (code) location used by the micro to begin 
+execution at the correct point after reset or when an interrupt handler is 
+invoked. It takes one of two forms:</P>
+<UL>
+  <LI>A jump (or branch) instruction located at a particular address in the code 
+  space. This instruction jumps to your entry point. 
+  <LI>The address of your entry point is stored at a particular location. 
+</LI></UL>
+<P>Typically all the vectors are together in one area, and this is referred to 
+as the <EM>vector table</EM>. Your assembler should have an ORG directive to 
+help you locate vectors correctly.</P>
+<H3>Choosing a Micro</H3>
+<P>You have some idea of what you'd like to build - all it needs is an engine. 
+Picking the right micro for the job is something that thousands of engineers 
+with many years of experience mull over every day - it can be a tough influenced 
+by many factors. Unlike desktop programming, where choice of language is a 
+near-religious issue, the instruction set should be the <U>least</U> of the 
+factors influencing you unless you're facing a tough deadline and simply don't 
+have time to learn something new. Otherwise, bite the bullet - it gets easier 
+with practice :-)</P>
+<P>These are things to consider:</P>
+<P><STRONG>Availability and cost</STRONG>: The micro must be readily available - 
+most are from a single manufacturer, but multiple distributors depending on your 
+location. And it must be sensibly priced - prices can vary insanely within a 
+family depending on demand, supply and popularity. Using a micro that's always 
+in stock with a large distributor is a good idea. Be careful with one-off shops 
+like Radio Spares and Farnell - their prices on micros are often exorbitant.</P>
+<P><STRONG>Support</STRONG>: Is the micro from a popular family? Ask people if 
+they'd recommend it (try comp.arch.embedded on usenet). Is the local distributor 
+helpful and (ideally) willing to lend you tools to get you hooked on it? What's 
+the manufacturer's website like? Be very cautious with Asian manufacturers - 
+they have some wonderful micros, but they simply don't care about your problems 
+unless you're using millions. NEC and Hitachi are exceptions to this that I can 
+recommend.</P>
+<P><STRONG>Tools</STRONG>: If you already own the appropriate development tools, 
+great. If not, check out what's available to see what fits your budget. Decide 
+whether you want an emulator, which is usually far more expensive than a simple 
+programmer. If tools cost is the driving factor serial programmers for flash 
+micros (eg H8, AVR) are unbeatable.</P>
+<P><STRONG>Variety</STRONG>: If you invest time and money in a new family, it's 
+a bonus if they are useful down the track. Get an overview of all the micros 
+that use that core and tools, and see if you like the view. The 8051 is 
+untouchable for variety, with the HC05 doing well at the smaller end of 
+town.</P>
+<P><STRONG>Reliability</STRONG>: New families (and even new parts in established 
+families) can have problems, usually in hardware rather than software. Don't use 
+a new part if you can't accept some risk. Micros dating from the late 70s are 
+still in widespread use, and the chance of your finding a new bug is pretty damn 
+small.</P>
+<P><STRONG>Flexibility</STRONG>: If you want to leave room to add more memory or 
+peripherals later, consider ROMless micros. You can hang anything off them you 
+can think of. The 8051 and HC11 rule this roost.</P>
+<P><STRONG>Package</STRONG>: It must be easy to handle given your manufacturing 
+expertise and programming tools. Don't pick a QFP (quad flat pack) chip unless 
+you have the equipment and knowhow to handle it. DIP and PLCC are both 
+socketable and easy to handle (DIP more so). If you need a lot of I/O but want 
+to avoid surface mount, ROMless micros with 24-line I/O expanders or HC574 
+latches are your guys. Unfortunately the level of micro power at which packages 
+become surface mount is decreasing as industry demands miniaturisation, so your 
+choice of newer parts may be limited.</P>
+<P><STRONG>Noise Immunity</STRONG>: In the mains appliance industry, where I've 
+spent some time, this is right up there with cost. Micros very greatly in their 
+resistance to the electrical crud that enters at power supplies and cabling, 
+sneaks through any attempts at filtering and locks your little baby up cold. The 
+ST6 family is superb at this, the Z8 very poor, with most somewhere in 
+between.</P>
+<H2>Developing For Micros</H2>
+<P>Developing code for a micro is nothing like programming a PC, except on rare 
+large projects using very high-end chips. While PC tools now offer ease of use 
+and high levels of abstraction, at the cost of memory consumption and speed, 
+fast execution and compact code remain the primary requirements of most micro 
+projects, hence the continuing dominance of assembly code. Unlike PCs, which 
+have no practical memory limitations or (in user mode) real-time requirements, 
+you usually need to keep the code, RAM size and speed of micros in mind when 
+coding for them.</P>
+<P>It's very desirable that the person writing the micro's code also designs the 
+circuit in which the micro is to live, since if it's designed with the 
+limitations and interfacing needs of the micro in mind it will make the 
+programmer's job much easier, not to mention possible! For example, it's not 
+practical for a micro to read data sent from a PC's parallel port at maximum 
+speed - some kind of bufferm, such as a FIFO memory chip, is required. It's a 
+question of commonsense and gaining a feel for what micros can handle - some of 
+them are relatively fast, but they're not logic chips or gate arrays!</P>
+<P>Many micro applications must respond to external stimuli in <EM>real 
+time</EM> - that is, with a guarantee maximum response time or <EM>latency</EM>. 
+If this applies to your application consider each such requirement carefully in 
+the context of the speed of your micro and the other tasks it must manage. 
+Real-time response should be based on interrupts if possible, since the response 
+latency is guaranteed by the micro's architecture. For frequent repeated 
+interrupts (such as serial data reception) sketch out the required interrupt 
+handler and count the instruction cycles taken, including the overhead of 
+interrupt invocation. If a micro is likely to spend 80% of its time in one 
+interrupt handler chances are you have a problem - since it effectively reduces 
+the micro's speed by a factor of 5!</P>
+<P>Micro code has no "exit point" - what would it exit to? There must be an 
+outer loop, usually called the <EM>main loop</EM>, which is repeatedly executed 
+forever. Most applications require multiple tasks to be performed 
+simultaneously. Although multi-tasking kernels for micros do exist, their 
+overhead and expense is usually only justifiable on large projects and high-end 
+parts. It's common practice for the main loop of a micro application to call 
+routines to service a number of tasks in rapid succession; if interrupt handlers 
+are invoked they effectively eat into the processing power available. If the 
+micro allows register context switching for interrupt handlers (use of a 
+separate set of registers) take advantage of it.</P>
+<P>If you are using a C compiler, beware of 16-bit default integer and constant 
+sizes - the overhead of 16-bit arithmetic is very high in most 8-bit micros. In 
+my opinion all data should be explicitly sized so that you know exactly where 
+your heavy processing will occur. Look at the generated assembly code often to 
+gain a feel for how you can help the compiler optimise your code without 
+sacrificing too much of the high-level abstraction you desire. Write interrupt 
+handlers and other time-critical code sections in assembler.</P>
+<P>In assembler, adopt and try to stick to some coding conventions to make your 
+code more reliable. Designate a couple of registers as <EM>scratch</EM> - used 
+to pass and return values to/from routines, and not guaranteed to be preserved 
+by any routine. Non-scratch registers must be saved (generally on the stack) by 
+any routine that uses them. Avoid writing routines with multiple entry or exit 
+points, even though this can save an instruction here or there - it greatly 
+reduces readability. Give every routine a header describing what it does, any 
+side-effects on peripherals or RAM, what's passed and returned and what 
+registers are used for, but don't bother with those big, ugly header templates 
+that look stupid above a 5-line routine. Divide your code into small logical 
+blocks separated by blank lines, and put labels on their own lines. Only use 
+non-descriptive label names where the jump is very short.</P>
+<H2>Debugging</H2>
+<P>It would be great if micro development was simply a matter of downloading the 
+code, verifying that it works correctly and moving on to the next project. 
+Unfortunately, bugs are inevitable. Some are due to simple coding mistakes (more 
+common in asesmbly), some are due to interactions between tasks you didn't 
+expect or too-large response latencies, and some are due to quirks of the 
+hardware that the data book forgot to mention.</P>
+<P>Firstly, don't try to write all the code in one session. Work incrementally, 
+getting things happening in small stages. That way you'll always have working 
+code to fall back on when things go wrong. Step through newly written code in a 
+simulator if possible to check that it works and doesn't have unwanted side 
+effects. It's much better to write and verify a piece code slowly and carefully, 
+before ever running it for real, than to try to fix it later when it's obscured 
+by other functionality.</P>
+<P>What you should do when your code doesn't work correctly depends on your 
+application and the tools available. The major thing to do is stay calm and use 
+your brain, which is a better debugging tool than anything else available. Most 
+bugs have a trivial cause, and getting frustrated and angry over debugging, 
+which you're going to be spending a lot of time doing, is pointless. It's almost 
+certain that the fault is something obvious in your code rather any malice on 
+the part of the micro. Look at what's happening objectively and try to grasp 
+what you've done to make that happen.</P>
+<P>Don't feel that you can't debug without an emulator or monitor. A spare I/O 
+line connected to a LED or, for timing-related problems, a <EM>CRO</EM> (Cathode 
+Ray Oscilloscope), can be used to indicate code paths, flag special conditions 
+etc. Due to the slow speeds and value of captured signal waveforms, PC-based CRO 
+or logic analyser packages are quite adequate. If your <EM>turnaround</EM> time 
+(time to rebuild your code and get it running ) is short, as is the case with 
+emulation and EPROM emulation, using a LED to delve into your code is quite 
+painless.</P>
+<P>The good news is that as you become more familiar with a micro's architecture 
+and instruction set, you'll introduce fewer bugs and become more efficient. Like 
+everything else, you get better with practice.</P>
+<H2>Core and Family Details</H2>
+<P>Finally, some details about specific cores and families! Some are factual 
+observations, others are subjective observations, others are merely my 
+opinions.</P>
+<H3>8051</H3>
+<P>First offered by Intel in the late 70s, this core is at the heart of the 
+biggest variety of micros on Earth, from several manufacturers. Philips is the 
+biggest player in the 8051 market, with Intel winding down their involvement to 
+concentrate on monpolising the PC CPU and chipset. The 8051 has a Harvard 
+architecture (code and internal data both start from 0).</P>
+<P>The 8051's I/O design is unique as far as I know. Rather than specifying a 
+line as an input or output, all lines have weak pullups and are either driven 
+low (set low by code) or not driven (set high by code), in which case they can 
+be pulled low by an external signal and that I/O bit used to read its state. 
+Essentially the internal output sink and any external sink function as a 
+wired-or gate. This has limitations, but is easy to use and makes bi-directional 
+I/O (eg I2C implementation) very easy.</P>
+<P>General pros:</P>
+<UL>
+  <LI>Powerful bit manipulation instructions - part of RAM and many special 
+  registers are bit-addressable. 
+  <LI>Multiply and divide instructions. 
+  <LI>At least two 16-bit timers. 
+  <LI>UART capable of 500kb/s at 16MHz on all but very small parts. 
+  <LI>Plentiful internal RAM. 
+  <LI>Straightforward code addressing - always starts at zero. 
+  <LI>I/O design makes bi-directional I/O easy. 
+  <LI>Excellent free assembler from Metalink. </LI></UL>
+<P>General cons:</P>
+<UL>
+  <LI>Very quirky instruction set 
+  <LI>Confusing variety of internal and external memory spaces. 
+  <LI>I/O design prevents true floating inputs, and pins are always high after 
+  reset. 
+  <LI>Not very fast due to clock division. 
+  <LI>Access to external data very weak - single pointer register only. 
+  <LI>Poor compiler support - no stack-relative access. 
+  <LI>Watchdog not standard. </LI></UL>
+<P>The 8051 is very comfortable to use once you've learnt it. It loses out to 
+some newer cores in speed - at 16MHz, the maximum standard speed, its 
+instruction cycle is 750ns, giving about 1MIP. Although several C compilers 
+exist the 8051 doesn't support HLLs well due to its single external data pointer 
+and no stack-relative access for stack frames. It works well for modest assembly 
+projects which don't use external RAM heavily. There is a free C compiler called 
+HDC which is now mature enough to be useable on small projects.</P>
+<H4>Varieties</H4>
+<P>The generic ROMless 80C31 and 80C32 (avoid the old room-heating NMOS versions 
+without the 'C') are a bargain, even with the cost of an EPROM considered, and 
+very flexible due to the wide variety of peripherals (all the Intel 82Cxx 
+series, ofr example) that it can easily address. They are available from several 
+mfrs, of which Temic and MHS appear to be the cheapest. The 80C32 includes an 
+extra timer which can be used to achieve higher UART baud rates.</P>
+<P>Philips have a very wide range, from very fast (40MHz) 24-pin parts to large 
+chips with a variety of specialised peripherals. Prices and availability vary 
+widely, though.</P>
+<P>Dallas have a small range using a core 3x faster than standard for the same 
+clock - it divides the clock by 4 rather than 12. The 80C320 is a drop-in 
+replacement for the standard 80C32 that offers an extra UART, external 
+interrupts and a watchdog as well as the speed boost, and is a very popular 
+micro. It can run at up to 33MHz for very high throughput (8MIPS), but EPROM 
+speed and interfacing becomes a problem. It's probably the most accessible 
+dual-UART micro around.</P>
+<P>Atmel used the 8051 core for their first small flash micros. The 89C2051 
+(80C32 core) is remarkable - a 20-pin micro with a UART, three 16-bit timers and 
+256 bytes of RAM was unheard of when it was introduced. I've used it on a 
+variety of small projects, and it's great to work with. The 89C1051 (80C31 
+core), which didn't include the UART, has now grown a 'U' variant that does - 
+hopefully it will be cheaper than the 2051. 40-pin flash parts are available, 
+but were pricey last I checked. Unfortunately Atmel's 8051-based family don't 
+include a watchdog.</P>
+<H3>Z8</H3>
+<P>The Zilog Z8 core is not new, but a family of small OTP parts oriented at the 
+low-cost consumer market is recent. Large ROMless parts exist, but I'm not aware 
+of any interest in them.</P>
+<P>General Pros:</P>
+<UL>
+  <LI>Cheap true emulator available, handles 18-40 pin parts. 
+  <LI>Non-accumulator instruction set. 
+  <LI>Moveable register "window" into RAM. 
+  <LI>Powerful, orthogonal instruction set. 
+  <LI>Two timers in all but smallest part. 
+  <LI>Watchdog standard. 
+  <LI>Two analog comparators standard. 
+  <LI>Wide range of 18-pin parts. </LI></UL>
+<P>General Cons:</P>
+<UL>
+  <LI>Poor noise immunity. 
+  <LI>No A/D in small parts 
+  <LI>No RESET pin 
+  <LI>Slow 
+  <LI>Timers 8-bit only. </LI></UL>
+<P>Very pleasant to use, although poor noise immunity is a serious problem in 
+some applications. The very cheap true emulator makes it an ideal beginner's 
+micro for someone prepared to spend a little money. Zilog's patchy support and 
+pricing may be of concern to corporate users.</P>
+<H3>AVR</H3>
+<P>A new family from Atmel touted as RISC, the AVR core promises blinding speed 
+at one instruction per clock cycle. Although initial data promised 20MHz clock 
+speeds, production speeds are only now reaching 8MHz. Even at 4MHz, the baseline 
+speed, a 250ns instruction cycles isn't to be sneezed at; it's 4 times quicker 
+than the PIC, its nearest competitor, at the same clock speed. Like their 
+8051-based family all AVR micros are flash-based, and free programmers are 
+already around. Atmel claim that the AVR was designed in consultation with C 
+compiler vendors, and it certainly includes some software features unexpected in 
+a RISC micro.</P>
+<P>General Pros:</P>
+<UL>
+  <LI>Flash based, programming specs published. 
+  <LI>Inputs have optional pullup and 20mA sink capability. 
+  <LI>Very high speed (almost 1MIPS/MHz) 
+  <LI>Large register space. 
+  <LI>All data processing register-to-register: no accumulator. 
+  <LI>Instruction set as powerful as possible given opcode space. 
+  <LI>Three RAM address pointers with auto increment/decrement. 
+  <LI>Zero-flag propagation for multi-byte compares. 
+  <LI>Watchdog and EEPROM standard. 
+  <LI>1Mb/s UART on all but smallest member. 
+  <LI>No reset circuit required. 
+  <LI>Separate I/O output latch and input pin registers. 
+  <LI>Excellent C compiler support. 
+  <LI>Able to address &gt;64K code and data. </LI></UL>
+<P>General Cons:</P>
+<UL>
+  <LI>Some odd restrictions on instruction usage. 
+  <LI>Apparent redundancy in instruction set. 
+  <LI>Instruction set not "clean" and orthogonal - hard to learn. 
+  <LI>Limited bit manipulation. 
+  <LI>No brown-out detector. 
+  <LI>Free assembler from Atmel is quite weak, </LI></UL>
+<P>Like the 8051, very capable when all the instruction set and memory space 
+quirks are understood. The non-accumulator design and zero-flag propagation make 
+multi-byte (eg 16-bit) arithmetic very compact. The separate output latch and 
+input pin I/O registers prevent those nastly glitches that plague 
+single-register designs. If Atmel can get the core speed up to 16MHz the AVR 
+will get into all sorts of high-speed applications previously barred to 
+micros.</P>
+<H4>Varieties</H4>
+<P>The baby of the family, the 1200, has some major limitations: a 3-level 
+hardware stack, no fetch-code-as-data mechansim for lookup tables, no RAM beyond 
+the 32 standard registers. But it's cheap, it's fast and it can use an internal 
+oscillator for operation with <U>no</U> external components!</P>
+<P>The 2313 is the one I'm drooling over - a 89S2051 on nitro, with a watchdog 
+and EEPROM thrown in! The 16-bit timer has capture/compare and PWM and as 
+mentioned the UART can manage 1Mb/s. Very nice.</P>
+<P>The 4414 and 8515 are 40-pinners with more code, RAM and EEPROM space and an 
+extra timer compare, but otherwise nothing extra.</P>
+<P>Data on 8-pin (take that, Microchip!) and a 64-pin (128K code space!) parts 
+has been released, so Atmel are evidently looking to make this a very broad 
+family.</P>
+<H3>PIC</H3>
+<P>Microchip's RISC family has been around a few years now. It has become very 
+popular through aggressive OTP pricing, a simple instruction set, robust 
+hardware (e.g. brown-out detectors) and excellent support. I haven't used it, 
+but I'll make some comments comparing it to the AVR, which is clearly designed 
+to compete with the PIC.</P>
+<P>Pros compared to AVR:</P>
+<UL>
+  <LI>Standard brown-out detector. 
+  <LI>Wide range of sizes and peripheral choices. 
+  <LI>More language and tool choices. 
+  <LI>Running at published clock speeds. </LI></UL>
+<P>Cons compared to AVR:</P>
+<UL>
+  <LI>4 times slower at same clock speed. 
+  <LI>Much weaker instruction set. 
+  <LI>Limited code and data addressing. 
+  <LI>No C compiler support. 
+  <LI>No flash parts (promised). 
+  <LI>Single I/O in/out register. 
+  <LI>Accumulator-based data processing. </LI></UL>
+<P>My impression, which is based on reading about the PIC rather than using it, 
+is that it's very capable in small micros but doesn't have the room to grow that 
+AVR promises in speed, addressing range and C compiler support. If flash parts 
+appear I'd probably recommend the PIC to a micro beginner due to its small 
+instruction set and straightforward architecture.</P>
+<H3>HC05</H3>
+<P>The old faithful of the low-end 8-bit market, and the one I cut my teeth on, 
+Motorola's HC05 looks rather dated these days, but some of the variants, most of 
+which began life as customer-specific designs, offer excellent value for 
+particular applications. </P>
+<P>General Pro:</P>
+<UL>
+  <LI>Von Neumann architecture is easy to understand. 
+  <LI>Straightforward instruction set with some bit handling. 
+  <LI>Excellent support from Motorola. </LI></UL>
+<P>General Con:</P>
+<UL>
+  <LI>Weak timers. 
+  <LI>No consistency within family - many variants specialised. 
+  <LI>No push/pop access to stack. 
+  <LI>Evaluation board (EVB) is expensive but unreliable. 
+  <LI>Not price-competitive. 
+  <LI>Slow. </LI></UL>
+<P>Not much to recommend it except its straightforward architecture. The EVB I 
+used was, frustratingly, almost a useable emulator, but not quite. Lack of 
+push/pop is a serious drawback IMHO.</P>
+<H3>HC11</H3>
+<P>A very popular family from Motorola, more powerful than the HC05, and 
+competitive with the 8051. Unfortunately I've never used it.</P>
+<P>Pros:</P>
+<UL>
+  <LI>Von Neumann architecture is easy to understand. 
+  <LI>Powerful, easy-to-use instruction set. 
+  <LI>Popular parts are good value. 
+  <LI>Good support for C compilers. 
+  <LI>Good support from Motorola. </LI></UL>
+<P>Cons:</P>
+<UL>
+  <LI>Much smaller range than 8051 derivatives. 
+  <LI>Slow UART. 
+  <LI>Overall: 
+  <LI>Probably easier to learn than the 8051, and a little more powerful, but 
+  less variety of derivatives. A logical upgrade for HC05 users. </LI></UL>
+<H3>78K0</H3>
+<P>NEC's 78K0 is one of the more notable Japanese families to gain popularity 
+outside Asia. Although emulation is expensive and the docs are poor, you get a 
+decent free C compiler and a lot of bang for the buck.</P>
+<P>General Pros:</P>
+<UL>
+  <LI>Very powerful instruction set with excellent C support. 
+  <LI>Some 16-bit data instructions. 
+  <LI>Fairly fast. 
+  <LI>Abundant timers on most parts. 
+  <LI>Free C compiler and structured assembler from NEC. 
+  <LI>Good value for money. </LI></UL>
+<P>General Cons:</P>
+<UL>
+  <LI>Most parts surface mount. 
+  <LI>Emulator very expensive 
+  <LI>Poor documentation. </LI></UL>
+<P>The only part I've used is the P14, a 100-pin surface-mount OTP device 
+featuring LCD drive, and apart from the hassles of handling the package itself 
+it was quite a pleasant experience. It's probably not of interest unless you 
+want LCD drive and have some money behind you.</P>
+<H3>H8</H3>
+<P>The H8 family (really a group of 8-bit and 16-bit families) is Hitachi's 
+mass-market offering. Similar in architecture to the HC05 at the low end, they 
+are notable for their early adoption of flash code and the (by all accounts) 
+excellent free port of the GNU C compiler.</P>
+<P>General pros:</P>
+<UL>
+  <LI>Many devices with flash. 
+  <LI>Powerful instruction set with good C support. 
+  <LI>Wide range of 8 and 16-bit devices. 
+  <LI>Good free C compiler 
+  <LI>Nice evaluation/programming boards available. 
+  <LI>Abundant timers. </LI></UL>
+<P>General cons:</P>
+<UL>
+  <LI>Most packages surface-mount. 
+  <LI>Emulation expensive. </LI></UL>
+<P>I haven't used these, but if I needed a compact high-pinout micro I'd look 
+closely at them. Flash support probably makes them the friendliest Japanese 
+micro around to get into.</P>
+<H3>ST6</H3>
+<P>The SGS-Thompson ST6 is a low-end OTP/mask family aimed squarely at consumer 
+devices. Its major features are excellent noise immunity and A/D conversion on 
+some very small parts.</P>
+<P>General Pros:</P>
+<UL>
+  <LI>Excellent noise immunity. 
+  <LI>EPROMs available throughout range for development. 
+  <LI>A/D converters available on low-end parts. 
+  <LI>Very good pricing at high volumes. </LI></UL>
+<P>General Cons:</P>
+<UL>
+  <LI>Awkward architecture and weak instruction set makes them unpleasant to 
+  use. 
+  <LI>Starter kit is weak, and emulation is expensive. 
+  <LI>Poor quality European docs. </LI></UL>
+<P>In the appliance industry noise immunity and low cost make any other fault 
+forgiveable. The instruction set is weak and the architecture is confusing, 
+especially on larger parts, but that doesn't put off serious users. I wouldn't 
+recommend it to beginners.</P>
+<H3>Others</H3>
+<P>There a several general-purpose micro families from U.S. mfrs that are not in 
+widespread use, but tools and support are available should they have features 
+you really need. Otherwise it's best to steer clear of them.</P>
+<P><STRONG>TMS370</STRONG>: Texas Instruments' general-purpose family. A good 
+range with very capable timers, but the very non-standard assembler is hard to 
+use. Largely confined to the auto industry.</P>
+<P><STRONG>COP8</STRONG>: National Semiconductor's general-purpose family. Was 
+dogged by poor EPROM availability for a long time, but is now quite useable.</P>
+<P><STRONG>HC08</STRONG>: Motorola's attempt at a family positioned between the 
+HC05 and HC11. I don't think it came to much.</P>
+<H2>My Recommendations</H2>
+<P><STRONG>Minimum tools cost</STRONG>: Small flash parts with simple 
+public-domain (build it yourself) programmers are hard to beat. Atmel is the 
+leader here with their small 8051 derivatives and AVR family, but Microchip are 
+threatening to release flash-based PICs, which are easier to learn than 
+either.</P>
+<P><STRONG>Minimum chip cost</STRONG>: Hard to comment on, because it depends on 
+your buying power and ability to mask the chip. The cheapest micros around are 
+4-bitters from the likes of NEC; the Z8 and PIC families probably offer the 
+cheapest 8-bit OTPs.</P>
+<P><STRONG>Friendliest cheap environment</STRONG>: It's hard to go past the very 
+friendly Zilog Z8 and their cheap emulator, which is a steal. Lack of EPROM 
+versions is the only real drawback, but the emulator makes them mostly 
+unnecessary.</P>
+<P><STRONG>Cheap, powerful C platform</STRONG>: The Hitachi H8 offers some very 
+large flash devices and a free C compiler.</P>
+<P><STRONG>High speed</STRONG>: In ROMless land the Dallas 80C320 is great 
+value, and offers a handy second UART. The Atmel AVR appears to be the fastest 
+8-bit core around, and at one instruction per clock cycle it's hard to see 
+anyone beating it soon. 16MHz devices will have a 62.5ns instruction cycle! Its 
+architecture also makes multi-byte arithmetic much more efficient that on 
+accumulator-based cores, making it competitive with many 16-bit micros.</P>
+<P><STRONG>Noise Immunity</STRONG>: The Thompson ST6 wins here hands down.</P>
+<P>Some special features:</P>
+<UL>
+  <LI><STRONG>Fast UART</STRONG>: 8051, PIC, AVR 
+  <LI><STRONG>Dual UARTs</STRONG>: Dallas 80C320 
+  <LI><STRONG>Brown-Out Detector</STRONG>: PIC 
+  <LI><STRONG>Timers with multiple capture/compares</STRONG>: Intel/Philips 
+  80C51FA, Philips 80C552 
+  <LI><STRONG>Lots of separate timers</STRONG>: some H8 parts </LI></UL>
+<P><A href="http://members.ozemail.com.au/~mvw/index.html">Return to my main 
+page</A></P></BODY></HTML>
